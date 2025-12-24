@@ -1,13 +1,26 @@
 import { useEffect, useState } from 'react';
 
-import { getApiBase, normalizeListResponse } from '../api';
+import { normalizeListResponse } from '../api';
+
+function getEndpoint() {
+  const configured = process.env.REACT_APP_CODESPACE_NAME;
+  const hostname = typeof window !== 'undefined' ? window.location.hostname : '';
+  const inferred = hostname.match(/^(.+)-3000\.app\.github\.dev$/)?.[1];
+  const codespaceName = configured || inferred;
+
+  if (codespaceName) {
+    return `https://${codespaceName}-8000.app.github.dev/api/workouts/`;
+  }
+
+  return 'http://localhost:8000/api/workouts/';
+}
 
 export default function Workouts() {
   const [workouts, setWorkouts] = useState([]);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(true);
 
-  const endpoint = `${getApiBase()}/workouts/`;
+  const endpoint = getEndpoint();
 
   useEffect(() => {
     console.log('[Workouts] REST endpoint:', endpoint);
